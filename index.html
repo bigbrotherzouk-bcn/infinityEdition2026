@@ -126,8 +126,11 @@
     .hero-logo {
       position: relative;
       z-index: 1;
-      width: min(92%, 820px);
+      display: block;
+      width: min(100%, 820px);
+      max-width: 100%;
       height: auto;
+      object-fit: contain;
       align-self: center;
       margin: 0 auto clamp(46px, 7vw, 72px);
       opacity: .94;
@@ -438,7 +441,7 @@
     @media (max-width: 680px) {
       .shell { width: min(100% - 20px, 940px); padding-top: 10px; }
       .hero { border-radius: 23px; }
-      .hero-logo { width: 112%; max-width: none; margin-bottom: 52px; }
+      .hero-logo { width: 100%; margin-bottom: clamp(40px, 12vw, 52px); }
       .day-grid, .bootcamp-grid, .checklist, .link-grid { grid-template-columns: 1fr; }
       .content { padding: 0 16px 20px; }
       summary { grid-template-columns: 43px 1fr 25px; padding: 12px 14px; }
