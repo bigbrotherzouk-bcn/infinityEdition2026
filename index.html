@@ -144,7 +144,9 @@
     .hero-copy {
       position: relative;
       z-index: 2;
-      width: 100%;
+      width: min(100%, 820px);
+      max-width: 100%;
+      align-self: center;
     }
 
     .eyebrow {
@@ -167,7 +169,8 @@
     }
 
     .intro {
-      max-width: 580px;
+      width: 100%;
+      max-width: 100%;
       margin: 0;
       color: #d6e5f5;
       font-size: 1.05rem;
@@ -178,7 +181,6 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      margin-top: 28px;
       padding: 11px 15px;
       border: 1px solid rgba(86, 213, 255, .28);
       border-radius: 999px;
@@ -186,6 +188,31 @@
       color: #dff7ff;
       font-weight: 750;
     }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+      margin-top: 28px;
+    }
+
+    .whatsapp-link {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 50%;
+      box-shadow: 0 8px 24px rgba(37, 211, 102, .26);
+      transition: transform .18s ease, filter .18s ease;
+    }
+
+    .whatsapp-link:hover { transform: translateY(-2px) scale(1.04); filter: brightness(1.08); }
+    .whatsapp-link:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    .whatsapp-link img { display: block; width: 100%; height: 100%; }
 
     .section-label {
       margin: 38px 4px 14px;
@@ -442,6 +469,9 @@
       .shell { width: min(100% - 20px, 940px); padding-top: 10px; }
       .hero { border-radius: 23px; }
       .hero-logo { width: 100%; margin-bottom: clamp(40px, 12vw, 52px); }
+      .hero-actions { gap: 10px; }
+      .date-chip { padding: 9px 11px; font-size: .78rem; white-space: nowrap; }
+      .whatsapp-link { width: 44px; height: 44px; }
       .day-grid, .bootcamp-grid, .checklist, .link-grid { grid-template-columns: 1fr; }
       .content { padding: 0 16px 20px; }
       summary { grid-template-columns: 43px 1fr 25px; padding: 12px 14px; }
@@ -470,7 +500,12 @@
       <div class="hero-copy">
         <div class="eyebrow">Official event guide</div>
         <p class="intro">Your guide to surviving the ultimate Zouk vacation. Dance with everyone, never stop smiling, connect with others and feel the true essence of Big Brother Zouk.</p>
-        <div class="date-chip">♾️ 23–29 September 2026</div>
+        <div class="hero-actions">
+          <div class="date-chip">♾️ 23–29 September 2026</div>
+          <a class="whatsapp-link" href="https://chat.whatsapp.com/EIAZghQfru6G8rD2TEZDD1" target="_blank" rel="noopener" aria-label="Open participants WhatsApp group" title="Open participants WhatsApp group">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='31' fill='%2325D366'/%3E%3Cpath fill='%23fff' d='M32 11.5c-11.4 0-20.7 8.5-20.7 19 0 3.7 1.2 7.3 3.4 10.3L11.2 52l11.7-3.4c2.8 1.2 5.9 1.8 9.1 1.8 11.4 0 20.7-8.5 20.7-19S43.4 11.5 32 11.5zm0 34.8c-2.8 0-5.4-.7-7.8-1.9l-.9-.5-6.8 2 2-6.4-.6-.9c-1.7-2.4-2.6-5.2-2.6-8.1 0-8.2 7.5-14.9 16.7-14.9s16.7 6.7 16.7 14.9S41.2 46.3 32 46.3z'/%3E%3Cpath fill='%23fff' d='M24.2 21.8c-.6 0-1.2.2-1.6.8-1 1.2-1.6 2.8-1.4 4.4.8 6.6 6.2 12 12.8 13.4 1.9.4 3.9 0 5.4-1.2.7-.5 1-1.2 1-2v-2.3c0-.7-.5-1.3-1.2-1.5l-4.4-1.3c-.6-.2-1.3 0-1.7.5l-1.1 1.3c-2.8-1.4-5.1-3.7-6.5-6.5l1.3-1.1c.5-.4.7-1.1.5-1.7L26 20.2c-.2-.7-.8-1.2-1.5-1.2h-.3z'/%3E%3C/svg%3E" alt="WhatsApp">
+          </a>
+        </div>
       </div>
     </header>
 
@@ -519,14 +554,6 @@
               <a class="button secondary" href="https://www.google.com/maps/search/?api=1&amp;query=Parc+de+la+Ciutadella+Barcelona" target="_blank" rel="noopener">🗺️ Open map</a>
             </article>
           </div>
-        </div>
-      </details>
-
-      <details>
-        <summary><span class="icon">💬</span><span>WhatsApp group</span><span class="chevron" aria-hidden="true"></span></summary>
-        <div class="content">
-          <p>💬 <strong>WhatsApp group for participants:</strong></p>
-          <a class="button" href="https://chat.whatsapp.com/EIAZghQfru6G8rD2TEZDD1" target="_blank" rel="noopener">Open participants group</a>
         </div>
       </details>
 
@@ -718,7 +745,6 @@
         "♾️ 23–29 September 2026": "♾️ 23–29 de septiembre de 2026",
         "Tap a section to open it": "Pulsa una sección para abrirla",
         "Big Brother Zouk week at a glance": "La semana de Big Brother Zouk de un vistazo",
-        "WhatsApp group": "Grupo de WhatsApp",
         "Wednesday 23/09": "Miércoles 23/09",
         "🌴 Pre-Party": "🌴 Pre-party",
         "📍 Unite Hostel Av. d’Icària, 145, Barcelona": "📍 <strong>Unite Hostel</strong><br>Av. d’Icària, 145, Barcelona",
@@ -824,8 +850,6 @@
         "Make it official!": "¡Hazlo oficial!",
         "Create your Infinity Edition frame, share your photo and let everyone know you’re coming. 💙♾️": "Crea tu <strong>frame de Infinity Edition</strong>, comparte tu foto y haz saber a todo el mundo que vienes. 💙♾️",
         "👉 Create your frame": "👉 Crea tu frame",
-        "💬 WhatsApp group for participants:": "💬 <strong>Grupo de WhatsApp para participantes:</strong>",
-        "Open participants group": "Abrir grupo de participantes",
         "That’s it! All the essential information in one place.": "¡Eso es todo! Toda la información esencial en un solo lugar.",
         "We can’t wait to welcome you and share a week full of dancing, connection and unforgettable moments. ❤️‍🔥": "Estamos deseando darte la bienvenida y compartir una semana llena de baile, conexión y momentos inolvidables. ❤️‍🔥",
         "See you very soon! Alicia & Moisés Big Brother Zouk Team ♾️": "¡Nos vemos muy pronto!<br><strong>Alicia &amp; Moisés</strong><br>Equipo de Big Brother Zouk ♾️"
