@@ -18,6 +18,7 @@
       --blue: #56d5ff;
       --violet: #9086ff;
       --hot: #ff5ea8;
+      --warning: #ffd166;
       --shadow: 0 24px 65px rgba(0, 0, 0, .32);
       --radius: 22px;
     }
@@ -240,6 +241,53 @@
     details[open] {
       border-color: rgba(86, 213, 255, .42);
       background: rgba(12, 31, 56, .96);
+    }
+
+    .important-details {
+      border-color: rgba(255, 209, 102, .58);
+      background:
+        linear-gradient(135deg, rgba(255, 94, 168, .1), rgba(255, 209, 102, .08)),
+        rgba(20, 29, 48, .96);
+      box-shadow: 0 14px 42px rgba(255, 94, 168, .12);
+    }
+
+    .important-details[open] {
+      border-color: rgba(255, 209, 102, .82);
+      background:
+        linear-gradient(135deg, rgba(255, 94, 168, .12), rgba(255, 209, 102, .1)),
+        rgba(16, 31, 53, .98);
+    }
+
+    .important-details summary { color: #fff4d1; }
+
+    .important-details .icon {
+      border-color: rgba(255, 209, 102, .46);
+      background: linear-gradient(145deg, rgba(255, 209, 102, .2), rgba(255, 94, 168, .15));
+    }
+
+    .important-details .chevron {
+      border-right-color: var(--warning);
+      border-bottom-color: var(--warning);
+    }
+
+    .tax-alert {
+      padding: 20px;
+      border: 1px solid rgba(255, 209, 102, .28);
+      border-radius: 17px;
+      background: rgba(7, 19, 38, .48);
+    }
+
+    .tax-alert .tax-amount {
+      padding: 14px 16px;
+      border-left: 3px solid var(--warning);
+      border-radius: 0 12px 12px 0;
+      background: rgba(255, 209, 102, .09);
+      color: #fff4d1;
+    }
+
+    .tax-alert .button {
+      background: linear-gradient(90deg, #e7a93b, #ff5ea8);
+      box-shadow: 0 8px 24px rgba(255, 94, 168, .16);
     }
 
     summary {
@@ -512,7 +560,21 @@
     <p class="section-label">Tap a section to open it</p>
 
     <section class="accordion" aria-label="Event information">
-      <details open>
+      <details class="important-details">
+        <summary><span class="icon">⚠️</span><span>Important: tourist tax at campsite check-in</span><span class="chevron" aria-hidden="true"></span></summary>
+        <div class="content">
+          <div class="tax-alert">
+            <p>This year, for the first time, each participant must pay the mandatory tourist tax directly to the campsite during the <strong>campsite check-in</strong>.</p>
+            <p class="tax-amount">The amount is <strong>€0.99 per person, per night — €3.96 per person for the full four-night stay</strong>. Please bring €3.96 in cash; <strong>€4 is also perfectly fine</strong>.</p>
+            <p>This is a mandatory local tax collected directly by the campsite and is completely external to Big Brother Zouk.</p>
+            <p>We’re sorry we weren’t able to communicate this sooner. Bringing the amount ready will be a huge help in making the campsite check-in quicker and smoother for everyone.</p>
+            <p>Thank you so much for your understanding and cooperation! ❤️</p>
+            <a class="button" href="https://atc.gencat.cat/es/tributs/ieet/" target="_blank" rel="noopener">🔗 Official tourist tax information</a>
+          </div>
+        </div>
+      </details>
+
+      <details>
         <summary><span class="icon">🔥</span><span>Big Brother Zouk week at a glance</span><span class="chevron" aria-hidden="true"></span></summary>
         <div class="content">
           <div class="day-grid">
@@ -744,6 +806,13 @@
         "Your guide to surviving the ultimate Zouk vacation. Dance with everyone, never stop smiling, connect with others and feel the true essence of Big Brother Zouk.": "Tu guía para sobrevivir a las mejores vacaciones de Zouk. Baila con todo el mundo, nunca dejes de sonreír, conecta con los demás y siente la verdadera esencia de Big Brother Zouk.",
         "♾️ 23–29 September 2026": "♾️ 23–29 de septiembre de 2026",
         "Tap a section to open it": "Pulsa una sección para abrirla",
+        "Important: tourist tax at campsite check-in": "Importante: tasa turística en el check-in del camping",
+        "This year, for the first time, each participant must pay the mandatory tourist tax directly to the campsite during the campsite check-in.": "Este año, por primera vez, cada participante deberá pagar la tasa turística obligatoria directamente al camping durante el <strong>check-in del camping</strong>.",
+        "The amount is €0.99 per person, per night — €3.96 per person for the full four-night stay. Please bring €3.96 in cash; €4 is also perfectly fine.": "El importe es de <strong>0,99 € por persona y noche — 3,96 € por persona por la estancia completa de cuatro noches</strong>. Por favor, trae 3,96 € en efectivo; <strong>4 € también está perfectamente bien</strong>.",
+        "This is a mandatory local tax collected directly by the campsite and is completely external to Big Brother Zouk.": "Es una tasa local obligatoria que cobra directamente el camping y es completamente externa a Big Brother Zouk.",
+        "We’re sorry we weren’t able to communicate this sooner. Bringing the amount ready will be a huge help in making the campsite check-in quicker and smoother for everyone.": "Sentimos no haber podido comunicarlo antes. Llevar el importe preparado será de gran ayuda para que el check-in del camping sea más rápido y fluido para todos.",
+        "Thank you so much for your understanding and cooperation! ❤️": "¡Muchas gracias por vuestra comprensión y colaboración! ❤️",
+        "🔗 Official tourist tax information": "🔗 Información oficial sobre la tasa turística",
         "Big Brother Zouk week at a glance": "La semana de Big Brother Zouk de un vistazo",
         "Wednesday 23/09": "Miércoles 23/09",
         "🌴 Pre-Party": "🌴 Pre-party",
