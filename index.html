@@ -486,6 +486,13 @@
       background: rgba(255, 94, 168, .08);
     }
 
+    .notice.very-important {
+      border-left-color: var(--warning);
+      background: linear-gradient(90deg, rgba(255, 209, 102, .15), rgba(255, 94, 168, .09));
+      color: #fff4d1;
+      box-shadow: 0 8px 24px rgba(255, 209, 102, .08);
+    }
+
     .checklist {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -627,7 +634,15 @@
             <article class="step">
               <h3>Campsite check-in</h3>
               <p>When you arrive, go to the reception at Camping Bon Repòs to register and collect your bungalow key.</p>
+              <div class="notice"><strong>📋 Check the list at the reception entrance before joining the queue.</strong><br>Your bungalow assignment and number will be posted there. Find your name first, then tell reception which bungalow you are in. This is the quickest way to keep check-in moving for everyone.</div>
+              <div class="notice very-important"><strong>🛏️ VERY IMPORTANT: ask for your bed linen and towels at reception during check-in.</strong><br>If you forget, you’ll have to come back to reception for them later. xD</div>
               <p>🔑 Keys are normally available from <strong>12:00</strong>.</p>
+              <h3>⏰ Important entry restrictions</h3>
+              <ul class="checklist">
+                <li><strong>B08-01 to B08-13:</strong> entry from 15:00 on Thursday.</li>
+                <li><strong>Tiny Suite 5:</strong> entry from 15:00 on Thursday.</li>
+              </ul>
+              <p>Entry times remain subject to campsite availability and may change if further reservations are received.</p>
               <p>If your bungalow is not ready yet, we’ll have a room where you can leave your luggage while you enjoy the campsite facilities or the beach.</p>
               <div class="notice"><strong>⚠️ Arriving after 21:00?</strong><br>Let us know in advance. Security will have your bungalow key ready, but you’ll need to visit reception the following day with your ID or passport to complete the official registration.</div>
             </article>
@@ -680,9 +695,18 @@
       <details>
         <summary><span class="icon">🧳</span><span>Monday check-out</span><span class="chevron" aria-hidden="true"></span></summary>
         <div class="content">
-          <p>The final check-out time is still pending confirmation.</p>
-          <p>Bungalow check-out is normally around <strong>12:00</strong>, although the campsite usually allows us to continue using the facilities until approximately <strong>17:00</strong>.</p>
-          <p>We’ll confirm the final details before the event.</p>
+          <p>Most bungalows must be vacated and the keys returned by <strong>12:00 on Monday</strong>.</p>
+          <div class="card">
+            <h3>⏰ Mandatory 11:00 check-out</h3>
+            <p>Because the campsite has incoming reservations, the following bungalows must be vacated and their keys returned by <strong>11:00 on Monday</strong>:</p>
+            <ul class="checklist">
+              <li><strong>B08-32, B08-34, B08-36, B08-38 and B08-40</strong></li>
+              <li><strong>B09-07</strong></li>
+              <li><strong>B16-11</strong></li>
+            </ul>
+          </div>
+          <p>The campsite usually allows us to continue using the facilities until approximately <strong>17:00</strong>.</p>
+          <div class="notice">⚠️ All arrival and departure times remain subject to campsite availability and may change if further reservations are received.</div>
         </div>
       </details>
 
@@ -862,7 +886,13 @@
         "Remember: first the campsite check-in, then the Big Brother Zouk check-in.": "Recuerda: <strong>primero el check-in del camping y después el check-in de Big Brother Zouk.</strong>",
         "Campsite check-in": "Check-in del camping",
         "When you arrive, go to the reception at Camping Bon Repòs to register and collect your bungalow key.": "Cuando llegues, ve a la recepción del Camping Bon Repòs para registrarte y recoger la llave de tu bungalow.",
+        "📋 Check the list at the reception entrance before joining the queue. Your bungalow assignment and number will be posted there. Find your name first, then tell reception which bungalow you are in. This is the quickest way to keep check-in moving for everyone.": "<strong>📋 Consulta el listado de la puerta de recepción antes de hacer cola.</strong><br>Allí aparecerán tu asignación y tu número de bungalow. Búscate primero en la lista y después dile en recepción en qué bungalow estás. Es la forma más rápida de agilizar el check-in para todos.",
+        "🛏️ VERY IMPORTANT: ask for your bed linen and towels at reception during check-in. If you forget, you’ll have to come back to reception for them later. xD": "<strong>🛏️ MUY IMPORTANTE: pide tus sábanas y toallas en recepción durante el check-in.</strong><br>Si se te olvida, te tocará volver a recepción a buscarlas después. xD",
         "🔑 Keys are normally available from 12:00.": "🔑 Las llaves normalmente están disponibles a partir de las <strong>12:00</strong>.",
+        "⏰ Important entry restrictions": "⏰ Restricciones importantes de entrada",
+        "B08-01 to B08-13: entry from 15:00 on Thursday.": "<strong>B08-01 a B08-13:</strong> entrada a partir de las 15:00 del jueves.",
+        "Tiny Suite 5: entry from 15:00 on Thursday.": "<strong>Tiny Suite 5:</strong> entrada a partir de las 15:00 del jueves.",
+        "Entry times remain subject to campsite availability and may change if further reservations are received.": "Los horarios de entrada quedan sujetos a la disponibilidad del camping y pueden cambiar si reciben nuevas reservas.",
         "If your bungalow is not ready yet, we’ll have a room where you can leave your luggage while you enjoy the campsite facilities or the beach.": "Si tu bungalow todavía no está preparado, tendremos una sala donde podrás dejar el equipaje mientras disfrutas de las instalaciones del camping o de la playa.",
         "⚠️ Arriving after 21:00? Let us know in advance. Security will have your bungalow key ready, but you’ll need to visit reception the following day with your ID or passport to complete the official registration.": "<strong>⚠️ ¿Llegas después de las 21:00?</strong><br>Avísanos con antelación. Seguridad tendrá preparada la llave de tu bungalow, pero al día siguiente tendrás que pasar por recepción con tu DNI o pasaporte para completar el registro oficial.",
         "Big Brother Zouk check-in": "Check-in de Big Brother Zouk",
@@ -905,9 +935,11 @@
         "On Sunday, we suggest wearing blue and white to create a little theme. 💙🤍": "El domingo proponemos vestir de <strong>azul y blanco</strong> para crear un pequeño ambiente temático. 💙🤍",
         "But it’s not mandatory. Come as you are!": "Pero no es obligatorio. ¡Ven tal como eres!",
         "Monday check-out": "Check-out del lunes",
-        "The final check-out time is still pending confirmation.": "La hora definitiva del check-out todavía está pendiente de confirmación.",
-        "Bungalow check-out is normally around 12:00, although the campsite usually allows us to continue using the facilities until approximately 17:00.": "El check-out del bungalow suele ser alrededor de las <strong>12:00</strong>, aunque el camping normalmente nos permite seguir utilizando las instalaciones hasta aproximadamente las <strong>17:00</strong>.",
-        "We’ll confirm the final details before the event.": "Confirmaremos los detalles definitivos antes del evento.",
+        "Most bungalows must be vacated and the keys returned by 12:00 on Monday.": "La mayoría de los bungalows deben quedar libres y las llaves deben entregarse antes de las <strong>12:00 del lunes</strong>.",
+        "⏰ Mandatory 11:00 check-out": "⏰ Check-out obligatorio a las 11:00",
+        "Because the campsite has incoming reservations, the following bungalows must be vacated and their keys returned by 11:00 on Monday:": "Como el camping tiene nuevas reservas, los siguientes bungalows deben quedar libres y sus llaves deben entregarse antes de las <strong>11:00 del lunes</strong>:",
+        "The campsite usually allows us to continue using the facilities until approximately 17:00.": "El camping normalmente nos permite seguir utilizando las instalaciones hasta aproximadamente las <strong>17:00</strong>.",
+        "⚠️ All arrival and departure times remain subject to campsite availability and may change if further reservations are received.": "⚠️ Todos los horarios de entrada y salida quedan sujetos a la disponibilidad del camping y pueden cambiar si reciben nuevas reservas.",
         "Staying in Barcelona?": "¿Te alojas en Barcelona?",
         "We recommend booking your accommodation as soon as possible.": "Te recomendamos reservar el alojamiento lo antes posible.",
         "You can get an extra 10% discount at Unite Hostel. It can also be combined with some of their other promotions, allowing you to save up to 28% in total.": "Puedes conseguir un <strong>10 % de descuento adicional</strong> en Unite Hostel. También puede combinarse con algunas de sus promociones para ahorrar hasta un 28 % en total.",
