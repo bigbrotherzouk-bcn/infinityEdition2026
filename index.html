@@ -144,6 +144,7 @@
     .icon-button:active { transform: scale(.96); }
     .action.primary { border-color: var(--accent); color: #141414; background: var(--accent); }
     .action.primary:hover { background: #ffe69a; }
+    .action.active { border-color: var(--accent); color: var(--accent); background: rgba(242, 211, 122, .1); }
     .action:disabled { opacity: .45; cursor: not-allowed; }
     .action svg { width: 17px; height: 17px; }
 
@@ -228,6 +229,9 @@
 
     .photo.selected::after { border-color: var(--accent); }
 
+    body.selection-mode .photo { cursor: pointer; }
+    body.selection-mode .photo:hover img { filter: brightness(.72); }
+
     .photo-tools {
       position: absolute;
       top: 10px;
@@ -256,8 +260,19 @@
       background: rgba(10,10,10,.66);
       box-shadow: 0 5px 18px rgba(0,0,0,.22);
       cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(.88);
+      transition: opacity .18s ease, transform .18s ease;
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
+    }
+
+    body.selection-mode .check-wrap,
+    .photo.selected .check-wrap {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
     }
 
     .check-wrap input {
@@ -326,6 +341,12 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .load-more-sentinel {
+      width: 100%;
+      height: 2px;
+      margin-top: 18px;
+    }
+
     .toast {
       position: fixed;
       right: 18px;
@@ -361,7 +382,7 @@
     .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; }
     .lightbox .close { position: absolute; top: 16px; right: 18px; }
     .lightbox .download-one { position: absolute; top: 16px; right: 64px; }
-    .lightbox .select-one { position: absolute; top: 16px; left: 18px; }
+    .lightbox .select-one { display: none; position: absolute; top: 16px; left: 18px; }
     .lightbox .previous { position: absolute; left: 18px; top: 50%; }
     .lightbox .next { position: absolute; right: 18px; top: 50%; }
     .lightbox-caption {
@@ -376,13 +397,15 @@
 
     @media (max-width: 1200px) {
       .gallery { column-count: 3; }
-      .action span { display: none; }
-      .action { width: 42px; padding: 0; }
+      .action .optional-label { display: none; }
+      .action { padding: 0 11px; }
     }
 
     @media (max-width: 820px) {
       .topbar { flex-wrap: wrap; gap: 7px 12px; padding: 10px 12px; }
-      .brand { flex: 1; }
+      .brand { flex: 1 0 100%; }
+      .actions { width: 100%; margin-left: 0; }
+      .action { flex: 1; }
       .filters { order: 3; flex-basis: 100%; }
       .filter { padding: 10px 9px; }
       main { padding: 12px; }
@@ -399,7 +422,10 @@
       .gallery { column-count: 1; }
       .gallery-head { display: block; }
       .selection-tools { flex-direction: row; justify-content: space-between; margin-top: 13px; }
-      .photo-tools { opacity: 1; transform: none; }
+      .photo:hover .photo-tools,
+      .photo:focus-within .photo-tools,
+      .photo.selected .photo-tools,
+      body.selection-mode .photo-tools { opacity: 1; transform: none; }
       .photo-label { display: none; }
     }
 
@@ -418,13 +444,17 @@
     <nav class="filters" id="filters" aria-label="Gallery days"></nav>
 
     <div class="actions">
-      <button class="action primary" id="downloadSelected" type="button" disabled title="Download selected photos">
+      <button class="action" id="selectionMode" type="button" aria-pressed="false" title="Select multiple photos">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+        <span>Seleccionar</span>
+      </button>
+      <button class="action primary" id="downloadSelected" type="button" title="Download all photos">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>
-        <span>Download</span>
+        <span>Download All</span>
       </button>
       <button class="action" id="sharePage" type="button" title="Share this gallery">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
-        <span>Share</span>
+        <span class="optional-label">Share</span>
       </button>
     </div>
   </header>
@@ -450,6 +480,7 @@
     </section>
 
     <section class="gallery" id="gallery" aria-label="Photo gallery" hidden></section>
+    <div class="load-more-sentinel" id="loadMoreSentinel" aria-hidden="true" hidden></div>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -490,12 +521,16 @@
     };
 
     const IMAGE_PATTERN = /\.(avif|gif|jpe?g|png|webp)$/i;
+    const BATCH_SIZE = 16;
     const state = {
       photos: [],
       visible: [],
       selected: new Set(),
-      activeFolder: 'all',
-      lightboxIndex: -1
+      activeFolder: null,
+      lightboxIndex: -1,
+      renderedCount: 0,
+      selectionMode: false,
+      loadObserver: null
     };
 
     const els = {
@@ -504,8 +539,10 @@
       status: document.querySelector('#status'),
       counter: document.querySelector('#counter'),
       selectAll: document.querySelector('#selectAll'),
+      selectionMode: document.querySelector('#selectionMode'),
       downloadSelected: document.querySelector('#downloadSelected'),
       sharePage: document.querySelector('#sharePage'),
+      loadMoreSentinel: document.querySelector('#loadMoreSentinel'),
       toast: document.querySelector('#toast'),
       lightbox: document.querySelector('#lightbox'),
       lightboxImage: document.querySelector('#lightboxImage'),
@@ -536,7 +573,7 @@
     function photoFromPath(path) {
       const relative = path.slice(CONFIG.mediaPath.length + 1);
       const parts = relative.split('/');
-      const folder = parts.length > 1 ? parts[0] : 'Highlights';
+      const folder = parts.length > 1 ? parts[0] : 'Gallery';
       const name = parts.at(-1);
       return {
         path,
@@ -567,8 +604,9 @@
       }
 
       state.photos = paths.map(photoFromPath);
-      renderFilters();
-      applyFilter('all');
+      const folders = renderFilters();
+      if (folders.length) applyFilter(folders[0]);
+      else renderGallery();
     }
 
     function readCache(key) {
@@ -581,10 +619,8 @@
 
     function renderFilters() {
       const folders = [...new Set(state.photos.map(photo => photo.folder))].sort(naturalCompare);
-      els.filters.replaceChildren(
-        makeFilterButton('all', 'Highlights'),
-        ...folders.map(folder => makeFilterButton(folder, humanize(folder)))
-      );
+      els.filters.replaceChildren(...folders.map(folder => makeFilterButton(folder, humanize(folder))));
+      return folders;
     }
 
     function makeFilterButton(folder, label) {
@@ -599,9 +635,7 @@
 
     function applyFilter(folder) {
       state.activeFolder = folder;
-      state.visible = folder === 'all'
-        ? [...state.photos]
-        : state.photos.filter(photo => photo.folder === folder);
+      state.visible = state.photos.filter(photo => photo.folder === folder);
 
       document.querySelectorAll('.filter').forEach(button => {
         button.classList.toggle('active', button.dataset.folder === folder);
@@ -612,15 +646,52 @@
     }
 
     function renderGallery() {
+      if (state.loadObserver) state.loadObserver.disconnect();
       els.status.hidden = true;
       els.gallery.hidden = false;
-      els.selectAll.hidden = state.visible.length === 0;
-      els.gallery.replaceChildren(...state.visible.map((photo, index) => createPhotoCard(photo, index)));
+      els.loadMoreSentinel.hidden = state.visible.length === 0;
+      els.selectAll.hidden = !state.selectionMode || state.visible.length === 0;
+      els.gallery.replaceChildren();
+      state.renderedCount = 0;
+      appendNextBatch();
+      observeNextBatch();
       updateSelectionUI();
 
       if (!state.visible.length) {
         showStatus('No photos yet', `Add image files inside “${CONFIG.mediaPath}” and its day folders.`);
       }
+    }
+
+    function appendNextBatch() {
+      if (state.renderedCount >= state.visible.length) {
+        if (state.loadObserver) state.loadObserver.disconnect();
+        els.loadMoreSentinel.hidden = true;
+        return;
+      }
+
+      const start = state.renderedCount;
+      const end = Math.min(start + BATCH_SIZE, state.visible.length);
+      const fragment = document.createDocumentFragment();
+      for (let index = start; index < end; index += 1) {
+        fragment.append(createPhotoCard(state.visible[index], index));
+      }
+      els.gallery.append(fragment);
+      state.renderedCount = end;
+      els.loadMoreSentinel.hidden = end >= state.visible.length;
+    }
+
+    function observeNextBatch() {
+      if (!('IntersectionObserver' in window) || state.renderedCount >= state.visible.length) {
+        if (!('IntersectionObserver' in window)) {
+          while (state.renderedCount < state.visible.length) appendNextBatch();
+        }
+        return;
+      }
+
+      state.loadObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) appendNextBatch();
+      }, { rootMargin: '900px 0px' });
+      state.loadObserver.observe(els.loadMoreSentinel);
     }
 
     function createPhotoCard(photo, index) {
@@ -638,7 +709,13 @@
         image.alt = `Could not load ${photo.name}`;
         figure.style.minHeight = '180px';
       });
-      image.addEventListener('click', () => openLightbox(index));
+      image.addEventListener('click', () => {
+        if (state.selectionMode) {
+          toggleSelection(photo, !state.selected.has(photo.path));
+        } else {
+          openLightbox(index);
+        }
+      });
 
       const tools = document.createElement('div');
       tools.className = 'photo-tools';
@@ -688,13 +765,31 @@
     function updateSelectionUI() {
       const count = state.selected.size;
       els.counter.textContent = count
-        ? `${count} selected · ${state.visible.length} shown`
+        ? `${count} selected · ${state.visible.length} photos`
         : `${state.visible.length} photo${state.visible.length === 1 ? '' : 's'}`;
-      els.downloadSelected.disabled = count === 0;
-      els.downloadSelected.querySelector('span').textContent = count ? `Download (${count})` : 'Download';
+      els.downloadSelected.querySelector('span').textContent = count ? `Download (${count})` : 'Download All';
+      els.downloadSelected.title = count ? `Download ${count} selected photos` : 'Download all photos';
       const everyVisibleSelected = state.visible.length > 0 && state.visible.every(photo => state.selected.has(photo.path));
       els.selectAll.textContent = everyVisibleSelected ? 'Clear selection' : 'Select all';
     }
+
+    function setSelectionMode(enabled) {
+      state.selectionMode = enabled;
+      document.body.classList.toggle('selection-mode', enabled);
+      els.selectionMode.classList.toggle('active', enabled);
+      els.selectionMode.setAttribute('aria-pressed', String(enabled));
+      els.selectionMode.querySelector('span').textContent = enabled ? 'Cancelar' : 'Seleccionar';
+      els.selectAll.hidden = !enabled || state.visible.length === 0;
+
+      if (!enabled) {
+        state.selected.clear();
+        document.querySelectorAll('.photo.selected').forEach(card => card.classList.remove('selected'));
+        document.querySelectorAll('.photo input[type="checkbox"]').forEach(checkbox => { checkbox.checked = false; });
+      }
+      updateSelectionUI();
+    }
+
+    els.selectionMode.addEventListener('click', () => setSelectionMode(!state.selectionMode));
 
     els.selectAll.addEventListener('click', () => {
       const everyVisibleSelected = state.visible.every(photo => state.selected.has(photo.path));
@@ -721,7 +816,10 @@
 
     els.downloadSelected.addEventListener('click', async () => {
       const selected = state.photos.filter(photo => state.selected.has(photo.path));
-      if (!selected.length) return;
+      if (!selected.length || selected.length === state.photos.length) {
+        downloadAll();
+        return;
+      }
       els.downloadSelected.disabled = true;
 
       try {
@@ -744,9 +842,19 @@
         console.error(error);
         showToast('One of the photos could not be downloaded. Please try again.');
       } finally {
-        els.downloadSelected.disabled = state.selected.size === 0;
+        els.downloadSelected.disabled = false;
       }
     });
+
+    function downloadAll() {
+      const link = document.createElement('a');
+      link.href = `https://github.com/${CONFIG.owner}/${CONFIG.repo}/archive/refs/heads/${CONFIG.branch}.zip`;
+      link.rel = 'noopener';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      showToast('Preparing the complete gallery download…');
+    }
 
     function uniqueZipName(photo, selection) {
       const duplicates = selection.filter(item => item.name === photo.name).length > 1;
@@ -935,6 +1043,7 @@
 
     function showStatus(title, detail) {
       els.gallery.hidden = true;
+      els.loadMoreSentinel.hidden = true;
       els.status.hidden = false;
       els.status.innerHTML = `<div class="status-card"><strong>${title}</strong><span>${detail}</span></div>`;
       els.counter.textContent = '0 photos';
@@ -951,4 +1060,3 @@
   </script>
 </body>
 </html>
-
