@@ -1,1 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0b">
+  <meta name="description" content="Big Brother Zouk — Infinity Edition 2026 photo gallery by Geoffrey Black Production.">
+  <title>Infinity Edition 2026 · Photo Gallery</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0b0b;
+      --panel: rgba(18, 18, 18, .92);
+      --card: #151515;
+      --text: #f5f3ef;
+      --muted: #aaa7a1;
+      --line: #30302f;
+      --accent: #f2d37a;
+      --danger: #ff6b6b;
+      --radius: 3px;
+      --gap: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-height: 70px;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: var(--panel);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      min-width: max-content;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      font-size: .78rem;
+      font-weight: 750;
+      line-height: 1.3;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--accent);
+      font-size: .62rem;
+      letter-spacing: .18em;
+    }
+
+    .filters {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: 5px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .filters::-webkit-scrollbar { display: none; }
+
+    .filter,
+    .action,
+    .icon-button {
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      transition: color .18s ease, background .18s ease, transform .18s ease;
+    }
+
+    .filter {
+      position: relative;
+      flex: 0 0 auto;
+      padding: 13px 12px;
+      white-space: nowrap;
+      font-size: .9rem;
+      font-weight: 650;
+    }
+
+    .filter::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      bottom: 5px;
+      left: 12px;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform .2s ease;
+    }
+
+    .filter:hover,
+    .filter.active { color: var(--text); }
+
+    .filter.active::after { transform: scaleX(1); }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      white-space: nowrap;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .action:hover { background: #232323; }
+    .action:active,
+    .icon-button:active { transform: scale(.96); }
+    .action.primary { border-color: var(--accent); color: #141414; background: var(--accent); }
+    .action.primary:hover { background: #ffe69a; }
+    .action:disabled { opacity: .45; cursor: not-allowed; }
+    .action svg { width: 17px; height: 17px; }
+
+    main { padding: 20px; }
+
+    .gallery-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 10px 2px 18px;
+    }
+
+    h1 {
+      margin: 0 0 5px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.8rem, 4vw, 3.65rem);
+      font-weight: 500;
+      letter-spacing: -.035em;
+    }
+
+    .subtitle,
+    .counter { margin: 0; color: var(--muted); font-size: .84rem; }
+
+    .selection-tools {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .text-button {
+      padding: 6px 0;
+      border: 0;
+      color: var(--text);
+      background: none;
+      cursor: pointer;
+      font-size: .82rem;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .gallery {
+      column-count: 4;
+      column-gap: var(--gap);
+    }
+
+    .photo {
+      position: relative;
+      margin: 0 0 var(--gap);
+      overflow: hidden;
+      break-inside: avoid;
+      border-radius: var(--radius);
+      background: var(--card);
+      cursor: zoom-in;
+    }
+
+    .photo img {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 160px;
+      object-fit: cover;
+      opacity: 0;
+      transform: scale(1.015);
+      transition: opacity .35s ease, transform .45s ease, filter .2s ease;
+    }
+
+    .photo img.loaded { opacity: 1; transform: scale(1); }
+    .photo:hover img { transform: scale(1.018); filter: brightness(.85); }
+
+    .photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 2px solid transparent;
+      border-radius: inherit;
+      transition: border-color .18s ease;
+    }
+
+    .photo.selected::after { border-color: var(--accent); }
+
+    .photo-tools {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      left: 10px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      opacity: 0;
+      transform: translateY(-5px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .photo:hover .photo-tools,
+    .photo:focus-within .photo-tools,
+    .photo.selected .photo-tools { opacity: 1; transform: translateY(0); }
+
+    .check-wrap {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 50%;
+      background: rgba(10,10,10,.66);
+      box-shadow: 0 5px 18px rgba(0,0,0,.22);
+      cursor: pointer;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+
+    .check-wrap input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .icon-button {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(10,10,10,.72);
+      box-shadow: 0 5px 18px rgba(0,0,0,.22);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+
+    .icon-button:hover { background: rgba(34,34,34,.95); }
+    .icon-button svg { width: 18px; height: 18px; }
+
+    .photo-label {
+      position: absolute;
+      right: 10px;
+      bottom: 9px;
+      left: 10px;
+      overflow: hidden;
+      color: rgba(255,255,255,.82);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: .69rem;
+      opacity: 0;
+      transition: opacity .18s ease;
+      text-shadow: 0 1px 4px #000;
+    }
+
+    .photo:hover .photo-label { opacity: 1; }
+
+    .status {
+      display: grid;
+      min-height: 50vh;
+      place-items: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .status-card { max-width: 540px; }
+    .status-card strong { display: block; margin-bottom: 10px; color: var(--text); font-size: 1.08rem; }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      margin: 0 auto 18px;
+      border: 2px solid #333;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 100;
+      max-width: min(390px, calc(100vw - 36px));
+      padding: 13px 17px;
+      border: 1px solid #3c3c3c;
+      border-radius: 10px;
+      color: var(--text);
+      background: #202020;
+      box-shadow: 0 18px 60px rgba(0,0,0,.42);
+      opacity: 0;
+      transform: translateY(18px);
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 66px 72px 46px;
+      background: rgba(0,0,0,.96);
+    }
+
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; }
+    .lightbox .close { position: absolute; top: 16px; right: 18px; }
+    .lightbox .download-one { position: absolute; top: 16px; right: 64px; }
+    .lightbox .select-one { position: absolute; top: 16px; left: 18px; }
+    .lightbox .previous { position: absolute; left: 18px; top: 50%; }
+    .lightbox .next { position: absolute; right: 18px; top: 50%; }
+    .lightbox-caption {
+      position: absolute;
+      right: 20px;
+      bottom: 16px;
+      left: 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .75rem;
+    }
+
+    @media (max-width: 1200px) {
+      .gallery { column-count: 3; }
+      .action span { display: none; }
+      .action { width: 42px; padding: 0; }
+    }
+
+    @media (max-width: 820px) {
+      .topbar { flex-wrap: wrap; gap: 7px 12px; padding: 10px 12px; }
+      .brand { flex: 1; }
+      .filters { order: 3; flex-basis: 100%; }
+      .filter { padding: 10px 9px; }
+      main { padding: 12px; }
+      .gallery { column-count: 2; column-gap: 7px; }
+      .photo { margin-bottom: 7px; }
+      .gallery-head { align-items: start; }
+      .selection-tools { flex-direction: column; align-items: end; gap: 4px; }
+      .lightbox { padding: 64px 10px 50px; }
+      .lightbox .previous { left: 8px; }
+      .lightbox .next { right: 8px; }
+    }
+
+    @media (max-width: 520px) {
+      .gallery { column-count: 1; }
+      .gallery-head { display: block; }
+      .selection-tools { flex-direction: row; justify-content: space-between; margin-top: 13px; }
+      .photo-tools { opacity: 1; transform: none; }
+      .photo-label { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Go to the top">
+      Big Brother Zouk
+      <span>Infinity Edition 2026</span>
+    </a>
+
+    <nav class="filters" id="filters" aria-label="Gallery days"></nav>
+
+    <div class="actions">
+      <button class="action primary" id="downloadSelected" type="button" disabled title="Download selected photos">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>
+        <span>Download</span>
+      </button>
+      <button class="action" id="sharePage" type="button" title="Share this gallery">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
+        <span>Share</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="gallery-head" aria-labelledby="galleryTitle">
+      <div>
+        <h1 id="galleryTitle">The moments we shared.</h1>
+        <p class="subtitle">Photography by Geoffrey Black Production</p>
+      </div>
+      <div class="selection-tools">
+        <p class="counter" id="counter" aria-live="polite">Loading gallery…</p>
+        <button class="text-button" id="selectAll" type="button" hidden>Select all</button>
+      </div>
+    </section>
+
+    <section class="status" id="status" aria-live="polite">
+      <div class="status-card">
+        <div class="spinner" aria-hidden="true"></div>
+        <strong>Loading the memories…</strong>
+        <span>Photos will appear in a moment.</span>
+      </div>
+    </section>
+
+    <section class="gallery" id="gallery" aria-label="Photo gallery" hidden></section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="icon-button select-one" id="lightboxSelect" type="button" aria-label="Select this photo">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+    </button>
+    <button class="icon-button download-one" id="lightboxDownload" type="button" aria-label="Download this photo">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>
+    </button>
+    <button class="icon-button close" id="lightboxClose" type="button" aria-label="Close viewer">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <button class="icon-button previous" id="previousPhoto" type="button" aria-label="Previous photo">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <img id="lightboxImage" alt="">
+    <button class="icon-button next" id="nextPhoto" type="button" aria-label="Next photo">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+
+  <script>
+    /*
+      GitHub configuration. The gallery automatically scans every subfolder in:
+      https://github.com/bigbrotherzouk-bcn/infinityEdition2026/tree/main/Media/Geoffrey
+
+      If the repository or branch changes, edit only these four values.
+    */
+    const CONFIG = {
+      owner: 'bigbrotherzouk-bcn',
+      repo: 'infinityEdition2026',
+      branch: 'main',
+      mediaPath: 'Media/Geoffrey',
+      siteBaseUrl: 'https://bigbrotherzouk-bcn.github.io/infinityEdition2026/'
+    };
+
+    const IMAGE_PATTERN = /\.(avif|gif|jpe?g|png|webp)$/i;
+    const state = {
+      photos: [],
+      visible: [],
+      selected: new Set(),
+      activeFolder: 'all',
+      lightboxIndex: -1
+    };
+
+    const els = {
+      filters: document.querySelector('#filters'),
+      gallery: document.querySelector('#gallery'),
+      status: document.querySelector('#status'),
+      counter: document.querySelector('#counter'),
+      selectAll: document.querySelector('#selectAll'),
+      downloadSelected: document.querySelector('#downloadSelected'),
+      sharePage: document.querySelector('#sharePage'),
+      toast: document.querySelector('#toast'),
+      lightbox: document.querySelector('#lightbox'),
+      lightboxImage: document.querySelector('#lightboxImage'),
+      lightboxCaption: document.querySelector('#lightboxCaption'),
+      lightboxClose: document.querySelector('#lightboxClose'),
+      lightboxDownload: document.querySelector('#lightboxDownload'),
+      lightboxSelect: document.querySelector('#lightboxSelect'),
+      previousPhoto: document.querySelector('#previousPhoto'),
+      nextPhoto: document.querySelector('#nextPhoto')
+    };
+
+    const iconDownload = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>';
+
+    function humanize(value) {
+      return decodeURIComponent(value)
+        .replace(/[_-]+/g, ' ')
+        .replace(/\b\w/g, letter => letter.toUpperCase());
+    }
+
+    function naturalCompare(a, b) {
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+    }
+
+    function encodePath(path) {
+      return path.split('/').map(encodeURIComponent).join('/');
+    }
+
+    function photoFromPath(path) {
+      const relative = path.slice(CONFIG.mediaPath.length + 1);
+      const parts = relative.split('/');
+      const folder = parts.length > 1 ? parts[0] : 'Highlights';
+      const name = parts.at(-1);
+      return {
+        path,
+        folder,
+        name,
+        // Photos are served from the same GitHub Pages site. GitHub's API is
+        // used only to discover new folders and files automatically.
+        url: new URL(encodePath(path), CONFIG.siteBaseUrl).href
+      };
+    }
+
+    async function loadPhotos() {
+      const cacheKey = `gallery-tree:${CONFIG.owner}/${CONFIG.repo}@${CONFIG.branch}:${CONFIG.mediaPath}`;
+      const cached = readCache(cacheKey);
+      let paths = cached;
+
+      if (!paths) {
+        const endpoint = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/git/trees/${CONFIG.branch}?recursive=1`;
+        const response = await fetch(endpoint, { headers: { Accept: 'application/vnd.github+json' } });
+        if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+        const data = await response.json();
+        if (data.truncated) throw new Error('The repository tree is too large to scan automatically.');
+        paths = data.tree
+          .filter(item => item.type === 'blob' && item.path.startsWith(`${CONFIG.mediaPath}/`) && IMAGE_PATTERN.test(item.path))
+          .map(item => item.path)
+          .sort(naturalCompare);
+        localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), paths }));
+      }
+
+      state.photos = paths.map(photoFromPath);
+      renderFilters();
+      applyFilter('all');
+    }
+
+    function readCache(key) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        if (value && Date.now() - value.savedAt < 15 * 60 * 1000 && Array.isArray(value.paths)) return value.paths;
+      } catch (_) { /* Ignore an unavailable or malformed cache. */ }
+      return null;
+    }
+
+    function renderFilters() {
+      const folders = [...new Set(state.photos.map(photo => photo.folder))].sort(naturalCompare);
+      els.filters.replaceChildren(
+        makeFilterButton('all', 'Highlights'),
+        ...folders.map(folder => makeFilterButton(folder, humanize(folder)))
+      );
+    }
+
+    function makeFilterButton(folder, label) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `filter${folder === state.activeFolder ? ' active' : ''}`;
+      button.dataset.folder = folder;
+      button.textContent = label;
+      button.addEventListener('click', () => applyFilter(folder));
+      return button;
+    }
+
+    function applyFilter(folder) {
+      state.activeFolder = folder;
+      state.visible = folder === 'all'
+        ? [...state.photos]
+        : state.photos.filter(photo => photo.folder === folder);
+
+      document.querySelectorAll('.filter').forEach(button => {
+        button.classList.toggle('active', button.dataset.folder === folder);
+        button.setAttribute('aria-current', button.dataset.folder === folder ? 'page' : 'false');
+      });
+
+      renderGallery();
+    }
+
+    function renderGallery() {
+      els.status.hidden = true;
+      els.gallery.hidden = false;
+      els.selectAll.hidden = state.visible.length === 0;
+      els.gallery.replaceChildren(...state.visible.map((photo, index) => createPhotoCard(photo, index)));
+      updateSelectionUI();
+
+      if (!state.visible.length) {
+        showStatus('No photos yet', `Add image files inside “${CONFIG.mediaPath}” and its day folders.`);
+      }
+    }
+
+    function createPhotoCard(photo, index) {
+      const figure = document.createElement('figure');
+      figure.className = `photo${state.selected.has(photo.path) ? ' selected' : ''}`;
+      figure.dataset.path = photo.path;
+
+      const image = document.createElement('img');
+      image.src = photo.url;
+      image.alt = `${humanize(photo.folder)} — ${photo.name}`;
+      image.loading = index < 8 ? 'eager' : 'lazy';
+      image.decoding = 'async';
+      image.addEventListener('load', () => image.classList.add('loaded'));
+      image.addEventListener('error', () => {
+        image.alt = `Could not load ${photo.name}`;
+        figure.style.minHeight = '180px';
+      });
+      image.addEventListener('click', () => openLightbox(index));
+
+      const tools = document.createElement('div');
+      tools.className = 'photo-tools';
+
+      const label = document.createElement('label');
+      label.className = 'check-wrap';
+      label.title = 'Select photo';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = state.selected.has(photo.path);
+      checkbox.setAttribute('aria-label', `Select ${photo.name}`);
+      checkbox.addEventListener('change', () => toggleSelection(photo, checkbox.checked));
+      label.append(checkbox);
+
+      const download = document.createElement('button');
+      download.type = 'button';
+      download.className = 'icon-button';
+      download.title = 'Download photo';
+      download.setAttribute('aria-label', `Download ${photo.name}`);
+      download.innerHTML = iconDownload;
+      download.addEventListener('click', event => {
+        event.stopPropagation();
+        downloadSingle(photo);
+      });
+
+      const caption = document.createElement('figcaption');
+      caption.className = 'photo-label';
+      caption.textContent = photo.name;
+
+      tools.append(label, download);
+      figure.append(image, tools, caption);
+      return figure;
+    }
+
+    function toggleSelection(photo, selected) {
+      selected ? state.selected.add(photo.path) : state.selected.delete(photo.path);
+      const card = [...els.gallery.children].find(item => item.dataset.path === photo.path);
+      if (card) {
+        card.classList.toggle('selected', selected);
+        const checkbox = card.querySelector('input[type="checkbox"]');
+        if (checkbox) checkbox.checked = selected;
+      }
+      updateSelectionUI();
+      updateLightboxSelect();
+    }
+
+    function updateSelectionUI() {
+      const count = state.selected.size;
+      els.counter.textContent = count
+        ? `${count} selected · ${state.visible.length} shown`
+        : `${state.visible.length} photo${state.visible.length === 1 ? '' : 's'}`;
+      els.downloadSelected.disabled = count === 0;
+      els.downloadSelected.querySelector('span').textContent = count ? `Download (${count})` : 'Download';
+      const everyVisibleSelected = state.visible.length > 0 && state.visible.every(photo => state.selected.has(photo.path));
+      els.selectAll.textContent = everyVisibleSelected ? 'Clear selection' : 'Select all';
+    }
+
+    els.selectAll.addEventListener('click', () => {
+      const everyVisibleSelected = state.visible.every(photo => state.selected.has(photo.path));
+      state.visible.forEach(photo => everyVisibleSelected ? state.selected.delete(photo.path) : state.selected.add(photo.path));
+      renderGallery();
+    });
+
+    async function fetchPhoto(photo) {
+      const response = await fetch(photo.url);
+      if (!response.ok) throw new Error(`Could not download ${photo.name}`);
+      return new Uint8Array(await response.arrayBuffer());
+    }
+
+    async function downloadSingle(photo) {
+      try {
+        showToast(`Preparing ${photo.name}…`);
+        const bytes = await fetchPhoto(photo);
+        saveBlob(new Blob([bytes]), photo.name);
+      } catch (error) {
+        window.open(photo.url, '_blank', 'noopener');
+        showToast('The photo was opened in a new tab.');
+      }
+    }
+
+    els.downloadSelected.addEventListener('click', async () => {
+      const selected = state.photos.filter(photo => state.selected.has(photo.path));
+      if (!selected.length) return;
+      els.downloadSelected.disabled = true;
+
+      try {
+        if (selected.length === 1) {
+          await downloadSingle(selected[0]);
+          return;
+        }
+
+        const files = [];
+        for (let index = 0; index < selected.length; index += 1) {
+          const photo = selected[index];
+          showToast(`Downloading ${index + 1} of ${selected.length}…`);
+          files.push({ name: uniqueZipName(photo, selected), data: await fetchPhoto(photo) });
+        }
+        showToast('Creating ZIP file…');
+        const zip = createZip(files);
+        saveBlob(zip, `Infinity-Edition-2026-${selected.length}-photos.zip`);
+        showToast('Your ZIP download is ready.');
+      } catch (error) {
+        console.error(error);
+        showToast('One of the photos could not be downloaded. Please try again.');
+      } finally {
+        els.downloadSelected.disabled = state.selected.size === 0;
+      }
+    });
+
+    function uniqueZipName(photo, selection) {
+      const duplicates = selection.filter(item => item.name === photo.name).length > 1;
+      return duplicates ? `${humanize(photo.folder)}/${photo.name}` : photo.name;
+    }
+
+    function saveBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    }
+
+    /* Small dependency-free ZIP writer. JPEG/PNG files are already compressed,
+       so the ZIP stores their bytes without recompressing them. */
+    function createZip(files) {
+      const encoder = new TextEncoder();
+      const localParts = [];
+      const centralParts = [];
+      let offset = 0;
+      const { time, date } = dosDateTime(new Date());
+
+      for (const file of files) {
+        const name = encoder.encode(file.name);
+        const data = file.data;
+        const crc = crc32(data);
+
+        const local = new Uint8Array(30 + name.length);
+        const localView = new DataView(local.buffer);
+        localView.setUint32(0, 0x04034b50, true);
+        localView.setUint16(4, 20, true);
+        localView.setUint16(6, 0x0800, true);
+        localView.setUint16(8, 0, true);
+        localView.setUint16(10, time, true);
+        localView.setUint16(12, date, true);
+        localView.setUint32(14, crc, true);
+        localView.setUint32(18, data.length, true);
+        localView.setUint32(22, data.length, true);
+        localView.setUint16(26, name.length, true);
+        localView.setUint16(28, 0, true);
+        local.set(name, 30);
+        localParts.push(local, data);
+
+        const central = new Uint8Array(46 + name.length);
+        const centralView = new DataView(central.buffer);
+        centralView.setUint32(0, 0x02014b50, true);
+        centralView.setUint16(4, 20, true);
+        centralView.setUint16(6, 20, true);
+        centralView.setUint16(8, 0x0800, true);
+        centralView.setUint16(10, 0, true);
+        centralView.setUint16(12, time, true);
+        centralView.setUint16(14, date, true);
+        centralView.setUint32(16, crc, true);
+        centralView.setUint32(20, data.length, true);
+        centralView.setUint32(24, data.length, true);
+        centralView.setUint16(28, name.length, true);
+        centralView.setUint16(30, 0, true);
+        centralView.setUint16(32, 0, true);
+        centralView.setUint16(34, 0, true);
+        centralView.setUint16(36, 0, true);
+        centralView.setUint32(38, 0, true);
+        centralView.setUint32(42, offset, true);
+        central.set(name, 46);
+        centralParts.push(central);
+
+        offset += local.length + data.length;
+      }
+
+      const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+      const end = new Uint8Array(22);
+      const endView = new DataView(end.buffer);
+      endView.setUint32(0, 0x06054b50, true);
+      endView.setUint16(4, 0, true);
+      endView.setUint16(6, 0, true);
+      endView.setUint16(8, files.length, true);
+      endView.setUint16(10, files.length, true);
+      endView.setUint32(12, centralSize, true);
+      endView.setUint32(16, offset, true);
+      endView.setUint16(20, 0, true);
+      return new Blob([...localParts, ...centralParts, end], { type: 'application/zip' });
+    }
+
+    function dosDateTime(value) {
+      const year = Math.max(1980, value.getFullYear());
+      return {
+        time: (value.getHours() << 11) | (value.getMinutes() << 5) | Math.floor(value.getSeconds() / 2),
+        date: ((year - 1980) << 9) | ((value.getMonth() + 1) << 5) | value.getDate()
+      };
+    }
+
+    function crc32(bytes) {
+      let crc = 0xffffffff;
+      for (const byte of bytes) {
+        crc ^= byte;
+        for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+      }
+      return (crc ^ 0xffffffff) >>> 0;
+    }
+
+    els.sharePage.addEventListener('click', async () => {
+      const shareData = {
+        title: document.title,
+        text: 'Big Brother Zouk · Infinity Edition 2026 photo gallery',
+        url: window.location.href
+      };
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(shareData.url);
+          showToast('Gallery link copied.');
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          window.prompt('Copy this gallery link:', shareData.url);
+        }
+      }
+    });
+
+    function openLightbox(index) {
+      state.lightboxIndex = index;
+      updateLightbox();
+      els.lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      els.lightboxClose.focus();
+    }
+
+    function closeLightbox() {
+      els.lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+      state.lightboxIndex = -1;
+    }
+
+    function moveLightbox(direction) {
+      if (!state.visible.length) return;
+      state.lightboxIndex = (state.lightboxIndex + direction + state.visible.length) % state.visible.length;
+      updateLightbox();
+    }
+
+    function updateLightbox() {
+      const photo = state.visible[state.lightboxIndex];
+      if (!photo) return;
+      els.lightboxImage.src = photo.url;
+      els.lightboxImage.alt = `${humanize(photo.folder)} — ${photo.name}`;
+      els.lightboxCaption.textContent = `${state.lightboxIndex + 1} / ${state.visible.length} · ${humanize(photo.folder)} · ${photo.name}`;
+      updateLightboxSelect();
+    }
+
+    function updateLightboxSelect() {
+      const photo = state.visible[state.lightboxIndex];
+      const isSelected = photo && state.selected.has(photo.path);
+      els.lightboxSelect.style.color = isSelected ? 'var(--accent)' : '#fff';
+      els.lightboxSelect.setAttribute('aria-label', isSelected ? 'Remove this photo from selection' : 'Select this photo');
+    }
+
+    els.lightboxClose.addEventListener('click', closeLightbox);
+    els.previousPhoto.addEventListener('click', () => moveLightbox(-1));
+    els.nextPhoto.addEventListener('click', () => moveLightbox(1));
+    els.lightboxDownload.addEventListener('click', () => downloadSingle(state.visible[state.lightboxIndex]));
+    els.lightboxSelect.addEventListener('click', () => {
+      const photo = state.visible[state.lightboxIndex];
+      toggleSelection(photo, !state.selected.has(photo.path));
+    });
+    els.lightbox.addEventListener('click', event => {
+      if (event.target === els.lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (!els.lightbox.classList.contains('open')) return;
+      if (event.key === 'Escape') closeLightbox();
+      if (event.key === 'ArrowLeft') moveLightbox(-1);
+      if (event.key === 'ArrowRight') moveLightbox(1);
+    });
+
+    let toastTimer;
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.classList.add('show');
+      toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2800);
+    }
+
+    function showStatus(title, detail) {
+      els.gallery.hidden = true;
+      els.status.hidden = false;
+      els.status.innerHTML = `<div class="status-card"><strong>${title}</strong><span>${detail}</span></div>`;
+      els.counter.textContent = '0 photos';
+      els.selectAll.hidden = true;
+    }
+
+    loadPhotos().catch(error => {
+      console.error(error);
+      showStatus(
+        'The gallery could not be loaded',
+        'Check that the repository is public and that CONFIG points to the correct owner, repository, branch and media folder.'
+      );
+    });
+  </script>
+</body>
+</html>
 
