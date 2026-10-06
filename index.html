@@ -329,18 +329,6 @@
     .status-card { max-width: 540px; }
     .status-card strong { display: block; margin-bottom: 10px; color: var(--text); font-size: 1.08rem; }
 
-    .spinner {
-      width: 38px;
-      height: 38px;
-      margin: 0 auto 18px;
-      border: 2px solid #333;
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     .load-more-sentinel {
       width: 100%;
       height: 2px;
@@ -471,13 +459,7 @@
       </div>
     </section>
 
-    <section class="status" id="status" aria-live="polite">
-      <div class="status-card">
-        <div class="spinner" aria-hidden="true"></div>
-        <strong>Loading the memories…</strong>
-        <span>Photos will appear in a moment.</span>
-      </div>
-    </section>
+    <section class="status" id="status" aria-live="polite" hidden></section>
 
     <section class="gallery" id="gallery" aria-label="Photo gallery" hidden></section>
     <div class="load-more-sentinel" id="loadMoreSentinel" aria-hidden="true" hidden></div>
